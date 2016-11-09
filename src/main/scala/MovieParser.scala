@@ -1,10 +1,12 @@
+import shapeless._
+import syntax.std.traversable._
 
 object MovieParser {
-  def apply(line: String): Option[(String, String, String, String, String, String, String, String)] = {
+  def apply(line: String): Option[(Option[String], Option[String], Option[String], Option[String], Option[String], Option[String], Option[String], Option[String])] = {
     val baseMatcherPattern = """(.*?) (\(\S{4,}\))\s?(\(.+\))?\s?(\{(.*?)(\(.+?\))\})?\s*(\{\{SUSPENDED\}\})?\s*(.*$)""".r
     baseMatcherPattern.findFirstMatchIn(line).map {
       matcher =>
-        (matcher.group(1), matcher.group(2), matcher.group(3), matcher.group(4), matcher.group(5), matcher.group(6), matcher.group(7), matcher.group(8))
+        (for( i <- 1 to 8) yield Option(matcher.group(i))).toHList[Option[String]::Option[String]::Option[String]::Option[String]::Option[String]::Option[String]::Option[String]::Option[String]::HNil].get.tupled
     }
   }
 }
