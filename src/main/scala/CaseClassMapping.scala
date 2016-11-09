@@ -1,34 +1,28 @@
-import slick.dbio.{DBIOAction, NoStream}
 import slick.driver.H2Driver.api._
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import slick.lifted.TableQuery
-
 import scala.concurrent.Await
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
 
 object CaseClassMapping extends App {
 
-  final def dbRun[R](a: DBIOAction[R, NoStream, Nothing]): R = Await.result(db.run(a), Duration.Inf)
-
   // the base query for the Users table
   val users = TableQuery[Users]
 
-  val db = Database.forURL("jdbc:h2:mem:hello", driver = "org.h2.Driver")
+  val db = Database.forConfig("h2mem1")
+  try {
+    Await.result(db.run(DBIO.seq(
+      // create the schema
+      users.schema.create,
 
-  Await.result(db.run(DBIO.seq(
-    // create the schema
-    users.schema.create,
-    // insert two User instances
-    users ++= Seq(
-      User("John Doe"),
-      User("Fred Smith")
-    )
+      // insert two User instances
+      users += User("John Doe"),
+      users += User("Fred Smith"),
 
-  )), Duration.Inf)
-
-  println(dbRun(users.result))
-  
+      // print the users (select * from USERS)
+      users.result.map(println)
+    )), Duration.Inf)
+  } finally db.close
 }
 
 case class User(name: String, id: Option[Int] = None)
@@ -37,7 +31,7 @@ class Users(tag: Tag) extends Table[User](tag, "USERS") {
   // Auto Increment the id primary key column
   def id = column[Int]("ID", O.PrimaryKey, O.AutoInc)
   // The name can't be null
-  def name = column[String]("NAME")//O.NotNull
+  def name = column[String]("NAME")
   // the * projection (e.g. select * ...) auto-transforms the tupled
   // column values to / from a User
   def * = (name, id.?) <> (User.tupled, User.unapply)
