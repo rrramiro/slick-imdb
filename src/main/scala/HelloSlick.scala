@@ -3,7 +3,7 @@ import slick.driver.H2Driver.api._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, Future}
+import scala.concurrent.{ Await, Future }
 
 // The main application
 object HelloSlick extends App {
@@ -23,7 +23,7 @@ object HelloSlick extends App {
 
       // Insert some suppliers
       suppliers += (101, "Acme, Inc.", "99 Market Street", "Groundsville", "CA", "95199"),
-      suppliers += ( 49, "Superior Coffee", "1 Party Place", "Mendocino", "CA", "95460"),
+      suppliers += (49, "Superior Coffee", "1 Party Place", "Mendocino", "CA", "95460"),
       suppliers += (150, "The High Ground", "100 Coffee Lane", "Meadows", "CA", "93966")
     )
 
@@ -31,11 +31,11 @@ object HelloSlick extends App {
     val f = setupFuture.flatMap { _ =>
 
       // Insert some coffees (using JDBC's batch insert feature)
-      val insertAction: DBIO[Option[Int]] = coffees ++= Seq (
-        ("Colombian",         101, 7.99, 0, 0),
-        ("French_Roast",       49, 8.99, 0, 0),
-        ("Espresso",          150, 9.99, 0, 0),
-        ("Colombian_Decaf",   101, 8.99, 0, 0),
+      val insertAction: DBIO[Option[Int]] = coffees ++= Seq(
+        ("Colombian", 101, 7.99, 0, 0),
+        ("French_Roast", 49, 8.99, 0, 0),
+        ("Espresso", 150, 9.99, 0, 0),
+        ("Colombian_Decaf", 101, 8.99, 0, 0),
         ("French_Roast_Decaf", 49, 9.99, 0, 0)
       )
 
@@ -107,7 +107,7 @@ object HelloSlick extends App {
       /* Delete */
 
       // Construct a delete query that deletes coffees with a price less than 8.0
-      val deleteQuery: Query[Coffees,(String, Int, Double, Int, Int), Seq] =
+      val deleteQuery: Query[Coffees, (String, Int, Double, Int, Int), Seq] =
         coffees.filter(_.price < 8.0)
 
       val deleteAction = deleteQuery.delete
